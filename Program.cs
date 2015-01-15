@@ -121,86 +121,6 @@ namespace EETuring
             return new WorldData(foreGroundTiles, tileData, (int)width, (int)height);
         }
 
-        public static void Print2D(int[,] array)
-        {
-            for (int i = 0; i < 25; i++)
-            {
-                for (int j = 0; j < 25; j++)
-                {
-                    string num = array[j, i].ToString();
-                    if (num.Length < 2)
-                    {
-                        num = "0" + num;
-                    }
-
-                    Console.Write(string.Format("{0} ", num));
-                }
-                Console.Write(Environment.NewLine + Environment.NewLine);
-            }
-        }
-
-        public static void Print2D(double[,] array)
-        {
-            for (int i = 0; i < 25; i++)
-            {
-                for (int j = 0; j < 25; j++)
-                {
-                    string num = Math.Round(array[j, i], 1).ToString().Replace(".", "");
-                    if (num.Length < 2)
-                    {
-                        num = "0" + num;
-                    }
-
-                    Console.Write(string.Format("{0} ", num));
-                }
-                Console.Write(Environment.NewLine + Environment.NewLine);
-            }
-        }
-
-        public static void Print2D(int[][] array)
-        {
-            for (int i = 0; i < 25; i++)
-            {
-                for (int j = 0; j < 25; j++)
-                {
-                    string num = array[j][i].ToString();
-                    if (num.Length < 2)
-                    {
-                        num = "0" + num;
-                    }
-
-                    Console.Write(string.Format("{0} ", num));
-                }
-                Console.Write(Environment.NewLine + Environment.NewLine);
-            }
-        }
-
-        public static void TestPF()
-        {
-            WorldData data = GetWorldData("PW1W4Ubqjwa0I");
-
-            PathFinder pf = new PathFinder(data, true);
-            EETuring.Physics.Point[] pts = pf.Solve(new EETuring.Physics.Point(1, 23), new EETuring.Physics.Point(23, 23));
-
-            WebRequest req = WebRequest.Create("http://api.everybodyedits.info/MapImageGenerator?id=PW1W4Ubqjwa0I");
-
-            System.Drawing.Bitmap bmp = (System.Drawing.Bitmap)System.Drawing.Image.FromStream(req.GetResponse().GetResponseStream());
-            System.Drawing.Graphics gfx = System.Drawing.Graphics.FromImage(bmp);
-            if (pts != null)
-            {
-                for (int i = 0; i < pts.Length - 1; i++)
-                {
-                    gfx.DrawLine(System.Drawing.Pens.Red, new System.Drawing.PointF(pts[i].x * 16 + 8, pts[i].y * 16 + 8), new System.Drawing.PointF(pts[i + 1].x * 16 + 8, pts[i + 1].y * 16 + 8));
-                }
-            }
-
-
-
-            gfx.Dispose();
-            bmp.Save(@"C:\Users\Austin Green\Desktop\path.png");
-            bmp.Dispose();
-        }
-
         public static void Main(string[] args)
         {
             /*
@@ -232,20 +152,24 @@ namespace EETuring
              * -Algorithm should be able to return a boolean yes or no if possible
              */
 
-            TestPF();
+            WorldData world = GetWorldData("PW1W4Ubqjwa0I");
 
-            WorldData data = GetWorldData("PW1W4Ubqjwa0I");
+            Turing turingTester = new Turing(world);
+            turingTester.OnProgress += turingTester_OnProgress;
+            turingTester.OnComplete += turingTester_OnComplete;
 
-
-            WorkbackA searcher = new WorkbackA(data);
-            bool possible = searcher.Search(new Point(1, 23), new Point(23, 23));
-
-            //APhysics searcher2 = new APhysics(data);
-            //bool possible = searcher2.Search(new Point(1, 16), new Point(18, 16));
-
-            string possibleStr = (possible) ? "Possible." : "Impossible.";
-            Console.WriteLine(possibleStr);
+            turingTester.SearchAsync(new Point(1, 23), new Point(23, 23));
             Console.ReadKey();
+        }
+
+        private static void turingTester_OnComplete(bool isPossible)
+        {
+            Console.WriteLine("IsPossible: {0}", isPossible);
+        }
+
+        private static void turingTester_OnProgress(double percentComplete)
+        {
+            Console.WriteLine("Progress: {0}%", percentComplete);
         }
     }
 }

@@ -14,6 +14,11 @@
             return base.Equals(obj);
         }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public override string ToString()
         {
             return string.Format("x: {0}, y: {1}", x, y);

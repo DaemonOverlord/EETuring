@@ -8,16 +8,21 @@ namespace EETuring
 {
     public class OpenSet
     {
-        private HashTable hashTable;
         private List<PlayerNode> list;
 
         public int Count { get { return list.Count; } }
 
+        /// <summary>
+        /// Add a node to the set
+        /// </summary>
         public void Add(PlayerNode node)
         {
             list.Add(node);
         }
 
+        /// <summary>
+        /// Sorts the nodes then removes and returns the best node
+        /// </summary>
         public PlayerNode Dequeue()
         {
             QuickSort(list, 0, list.Count);
@@ -27,7 +32,10 @@ namespace EETuring
             return top;
         }
 
-        private int MyPartition(List<PlayerNode> list, int left, int right)
+        /// <summary>
+        /// Quicksort partition of a list pivoting at the left and right indicies
+        /// </summary>
+        private int QuicksortPartition(List<PlayerNode> list, int left, int right)
         {
             int start = left;
             PlayerNode pivot = list[start];
@@ -58,6 +66,9 @@ namespace EETuring
             }
         }
 
+        /// <summary>
+        /// Recursive quicksort algorithm
+        /// </summary>
         private void QuickSort(List<PlayerNode> list, int left, int right)
         {
             if (list == null || list.Count <= 1)
@@ -65,16 +76,14 @@ namespace EETuring
 
             if (left < right)
             {
-                int pivotIdx = MyPartition(list, left, right);
+                int pivotIdx = QuicksortPartition(list, left, right);
                 QuickSort(list, left, pivotIdx - 1);
                 QuickSort(list, pivotIdx, right);
             }
         }
 
-        public OpenSet(HashTable hashTable)
+        public OpenSet()
         {
-            this.hashTable = hashTable;
-            hashTable.Release();
             list = new List<PlayerNode>();
         }
     }

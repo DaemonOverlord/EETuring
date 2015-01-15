@@ -46,13 +46,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Diagram.cs" />
-    <Compile Include="FillNode.cs" />
-    <Compile Include="FloodFill.cs" />
     <Compile Include="HashTable.cs" />
     <Compile Include="Heuristic.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="PathFinder.cs" />
-    <Compile Include="WorkbackA.cs" />
+    <Compile Include="ProgressCallback.cs" />
+    <Compile Include="TestCompleteCallback.cs" />
+    <Compile Include="Turing.cs" />
+    <Compile Include="WorkbackProcessor.cs" />
     <Compile Include="OpenSet.cs" />
     <Compile Include="PlayerNode.cs" />
     <Compile Include="Physics\Input.cs" />

@@ -18,6 +18,15 @@ namespace EETuring
             return base.Equals(obj);
         }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="p"></param>
         public Node(Point p)
         {
             Point = p;

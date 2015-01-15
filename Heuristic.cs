@@ -11,33 +11,51 @@ namespace EETuring
     {
         private double[,] heuristicMap;
 
+        /// <summary>
+        /// Start point
+        /// </summary>
         public Point A { get; set; }
+
+        /// <summary>
+        /// Goal
+        /// </summary>
         public Point B { get; set; }
 
+        /// <summary>
+        /// Gets the distance between two points in space
+        /// </summary>
         private double Dis(Point a, Point b)
         {
             return Math.Sqrt(Math.Pow(a.x - b.x, 2) + Math.Pow(a.y - b.y, 2));
         }
 
+        /// <summary>
+        /// Gets the distance between two points in space
+        /// </summary>
         private double Dis(double x1, double x2, double y1, double y2)
         {
             return Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
         }
 
+        /// <summary>
+        /// Gets the distance between two nodes in block units
+        /// </summary>
         public double DisBetween(PlayerNode a, PlayerNode b)
         {
             return Dis(a.X, b.X, a.Y, b.Y) / 16;
         }
 
         /// <summary>
-        /// weight of two nodes
+        /// Calculates the cost of a node
         /// </summary>
         public double EstimateCost(PlayerNode u)
         {
-            return Dis(u.X, u.Y, B.x * 16, B.y * 16);
-            //return heuristicMap[u.BX, u.BY];
+            return heuristicMap[u.BX, u.BY];
         }
 
+        /// <summary>
+        /// Gets adjacent nodes due next to a point
+        /// </summary>
         private Point[] ParentLocations(Point current, int gridWidth, int gridHeight)
         {
             List<Point> possible = new List<Point>();
@@ -60,6 +78,11 @@ namespace EETuring
             return possible.ToArray();
         }
 
+        /// <summary>
+        /// Performs a heuristic decay along the nodes with values
+        /// </summary>
+        /// <param name="solution">Path solution to goal</param>
+        [Obsolete("No increase in heuristic cost")]
         private void PerformDecay(Point[] solution)
         {
             Queue<Point> nodes = new Queue<Point>();
@@ -105,6 +128,10 @@ namespace EETuring
             }
         }
 
+        /// <summary>
+        /// Inverts the heuristic costs so the goal costs 0
+        /// </summary>
+        /// <param name="z">Highest value</param>
         private void Invert(double z)
         {
             for (int y = 0; y < heuristicMap.GetLength(1); y++)
@@ -116,6 +143,9 @@ namespace EETuring
             }
         }
 
+        /// <summary>
+        /// Calculates a levels heuristics cost bonus
+        /// </summary>
         public bool Calculate(WorldData data, bool usePhysics)
         {
             PathFinder pathFinder = new PathFinder(data, usePhysics);
@@ -129,9 +159,7 @@ namespace EETuring
                     heuristicMap[solution[i].x, solution[i].y] = i + 1;
                 }
 
-                PerformDecay(solution);
                 Invert(solution.Length);
-
                 return true;
             }
 

@@ -1,12 +1,11 @@
 ﻿using EETuring.Physics;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace EETuring
 {
-    public class WorkbackA : IDisposable
+    public class WorkbackProcessor : IDisposable
     {
         private PhysicsPlayer player;
         private PhysicsWorld world;
@@ -15,50 +14,73 @@ namespace EETuring
         private Heuristic heuristic;
         private HashTable hashTable;
 
-        public bool Goal(PlayerNode u, Point t)
+        private int currentSearch = 0;
+        private int currentPathNodesComplete = 0;
+        private ProgressCallback pCallback;
+        private TestCompleteCallback tCallback;
+
+        /// <summary>
+        /// Tests if a node is the goal
+        /// </summary>
+        private bool IsGoal(PlayerNode u, Point t)
         {
             return u.IsGoal(t);
         }
 
-        public bool Search(Point a, Point b)
+        /// <summary>
+        /// Starts a search
+        /// </summary>
+        /// <param name="a">Start point</param>
+        /// <param name="b">Goal</param>
+        public void Search(Point a, Point b)
         {         
             for (int s = 0; s < 2; s++)
             {
-                Console.Clear();
-                Console.WriteLine("Calculating new path.");
-
                 //For now this algorithm will only work with the shortest path
                 bool usePhysicsPF = s == 0 ? false : true;
                 PathFinder pathFinder = new PathFinder(worldData, usePhysicsPF);
                 Point[] shortestPath = pathFinder.Solve(a, b);
                 if (shortestPath == null)
                 {
-                    return false;
+                    if (pCallback != null) pCallback(100);
+                    if (tCallback != null) tCallback(false);
+                    return;
                 }
 
-                Console.Write("Doing quick search...");
-                long estimatatedTime = 1000 * shortestPath.Length;
+                currentSearch = s;
+                currentPathNodesComplete = 0;
+                long estimatatedTime = 250 * shortestPath.Length;
                 if (SearchPlane(a, b, estimatatedTime, usePhysicsPF))
                 {
-                    return true;
+                    if (pCallback != null) pCallback(100);
+                    if (tCallback != null) tCallback(true);
+                    return;
                 }
-
-                Console.WriteLine("Failed, looking in depth.");
-
-
 
                 //Start the workback algorithm
                 if (WorkbackSearch(shortestPath, shortestPath.Length - 2, shortestPath.Length - 1, false, usePhysicsPF))
                 {
-                    return true;
+                    if (pCallback != null) pCallback(100);
+                    if (tCallback != null) tCallback(true);
+                    return;
                 }
             }
 
-            return false;
+            if (pCallback != null) pCallback(100);
+            if (tCallback != null) tCallback(false);
+            return;
         }
 
+        /// <summary>
+        /// Recursive workback search
+        /// </summary>
         private bool WorkbackSearch(Point[] guide, int a, int b, bool backtracking, bool usePhysicsPF)
         {
+            if (!backtracking)
+            {
+                if (pCallback != null) pCallback(100 * ((currentSearch * 0.5) + (0.5 * (currentPathNodesComplete / (double)guide.Length))));
+            }
+
             if (b == 0)
             {
                 return true;
@@ -77,7 +99,7 @@ namespace EETuring
             {
                 if (!backtracking)
                 {
-                    Console.WriteLine("Mapped ({0}) -> ({1})", guide[a], guide[b]);
+                    currentPathNodesComplete++;
                     return WorkbackSearch(guide, a - 1, a, backtracking, usePhysicsPF);
                 }
                 else
@@ -95,26 +117,25 @@ namespace EETuring
                     {
                         if (WorkbackSearch(guide, a, tb, true, usePhysicsPF))
                         {
-                            Console.WriteLine("Mapped ({0}) -> ({1}) -> ({2})", guide[a], guide[b], guide[tb]);
+                            currentPathNodesComplete++;
                             return WorkbackSearch(guide, a - 1, a, backtracking, usePhysicsPF);
                         }
                     }
                 }
-
-                if (!backtracking)
-                {
-                    Console.WriteLine("Failed to map ({0}) -> ({1})", guide[a], guide[b]);
-                }
                 else
                 {
-                    Console.WriteLine("\tFailed to map ({0}) -> ({1})", guide[a], guide[b]);
+                    //return a pruned false
                     return false;
                 }
 
+                currentPathNodesComplete++;
                 return WorkbackSearch(guide, a - 1, b, backtracking, usePhysicsPF);
             }
         }
 
+        /// <summary>
+        /// Searchs the plane, efficiency increases the closer of points
+        /// </summary>
         private bool SearchPlane(Point a, Point b, long timeout, bool usePhysicsPF)
         {
             PlayerState sState = new PlayerState(a);
@@ -134,9 +155,11 @@ namespace EETuring
             PlayerNode start = new PlayerNode(Input.Nothing, sState);
             start.F = heuristic.EstimateCost(start);
 
-            OpenSet openSet = new OpenSet(hashTable);
+            hashTable.Release();
+            OpenSet openSet = new OpenSet();
             openSet.Add(start);
 
+            bool found = false;
             Stopwatch sw = Stopwatch.StartNew();
             while (openSet.Count > 0)
             {
@@ -150,10 +173,6 @@ namespace EETuring
                 for (int t = 0; t <= 100; t += inc)
                 {
                     List<PlayerNode> branches = world.GetNodes(player, current.State, t);
-                    if (sw.ElapsedMilliseconds > timeout)
-                    {
-                        break;
-                    }
 
                     for (int i = 0; i < branches.Count; i++)
                     {
@@ -164,9 +183,8 @@ namespace EETuring
 
                         if (branches[i].IsGoal(b))
                         {
-                            return true;
+                            found = true;
                         }
-
 
                         hashTable.Add(branches[i].State);
                         branches[i].F = heuristic.EstimateCost(branches[i]);
@@ -175,17 +193,29 @@ namespace EETuring
 
                     inc += 5;
                 }
+
+                if (found)
+                {
+                    return true;
+                }
             }
 
             return false;
         }
 
+        /// <summary>
+        /// Disposes hash resources
+        /// </summary>
         public void Dispose()
         {
             hashTable.Dispose();
         }
 
-        public WorkbackA(WorldData worldData)
+        /// <summary>
+        /// Creates a new processor
+        /// </summary>
+        /// <param name="worldData">WorldData</param>
+        public WorkbackProcessor(WorldData worldData, ProgressCallback pCallback, TestCompleteCallback tCallback)
         {
             world = new PhysicsWorld(worldData);
             player = new PhysicsPlayer(world);
@@ -193,6 +223,8 @@ namespace EETuring
 
             hashTable = new HashTable();
             this.worldData = worldData;
+            this.pCallback = pCallback;
+            this.tCallback = tCallback;
         }
     }
 }
