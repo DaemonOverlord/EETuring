@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PlayerIOClient">
       <HintPath>..\..\..\..\..\Desktop\Libraries\Yahoo Games Network\DotNet\PlayerIOClient.dll</HintPath>
@@ -49,6 +52,7 @@
     <Compile Include="HashTable.cs" />
     <Compile Include="Heuristic.cs" />
     <Compile Include="Node.cs" />
+    <Compile Include="Path.cs" />
     <Compile Include="PathFinder.cs" />
     <Compile Include="ProgressCallback.cs" />
     <Compile Include="TestCompleteCallback.cs" />

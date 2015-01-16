@@ -155,13 +155,13 @@ namespace EETuring
             turingTester.OnProgress += turingTester_OnProgress;
             turingTester.OnComplete += turingTester_OnComplete;
 
-            turingTester.SearchAsync(new Point(3, 23), new Point(23, 23));
+            turingTester.SearchAsync(new Point(1, 23), new Point(23, 23));
             Console.ReadKey();
 
             turingTester.Dispose();
         }
 
-        private static void turingTester_OnComplete(bool isPossible)
+        private static void turingTester_OnComplete(Path path, bool isPossible)
         {
             Console.WriteLine("IsPossible: {0}", isPossible);
         }

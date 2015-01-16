@@ -23,11 +23,11 @@ namespace EETuring
             }
         }
 
-        private void OnTuringTestComplete(bool isPossible)
+        private void OnTuringTestComplete(Path path, bool isPossible)
         {
             if (OnComplete != null)
             {
-                OnComplete(isPossible);
+                OnComplete(path, isPossible);
             }
         }
 

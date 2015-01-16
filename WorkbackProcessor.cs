@@ -52,29 +52,31 @@ namespace EETuring
                 long estimatatedTime = 250 * shortestPath.Length;
                 if (SearchPlane(a, b, estimatatedTime, usePhysicsPF))
                 {
+                    Path path = new Path(shortestPath);
                     if (pCallback != null) pCallback(100);
-                    if (tCallback != null) tCallback(true);
+                    if (tCallback != null) tCallback(path, true);
                     return;
                 }
 
                 //Start the workback algorithm
-                if (WorkbackSearch(shortestPath, shortestPath.Length - 2, shortestPath.Length - 1, false, usePhysicsPF))
+                Path workbackPath = new Path();
+                if (WorkbackSearch(workbackPath, shortestPath, shortestPath.Length - 2, shortestPath.Length - 1, false, usePhysicsPF))
                 {
                     if (pCallback != null) pCallback(100);
-                    if (tCallback != null) tCallback(true);
+                    if (tCallback != null) tCallback(workbackPath, true);
                     return;
                 }
             }
 
             if (pCallback != null) pCallback(100);
-            if (tCallback != null) tCallback(false);
+            if (tCallback != null) tCallback(null, false);
             return;
         }
 
         /// <summary>
         /// Recursive workback search
         /// </summary>
-        private bool WorkbackSearch(Point[] guide, int a, int b, bool backtracking, bool usePhysicsPF)
+        private bool WorkbackSearch(Path path, Point[] guide, int a, int b, bool backtracking, bool usePhysicsPF)
         {
             if (!backtracking)
             {
@@ -99,8 +101,10 @@ namespace EETuring
             {
                 if (!backtracking)
                 {
+                    path.Map(guide[a]);
+
                     currentPathNodesComplete++;
-                    return WorkbackSearch(guide, a - 1, a, backtracking, usePhysicsPF);
+                    return WorkbackSearch(path, guide, a - 1, a, backtracking, usePhysicsPF);
                 }
                 else
                 {
@@ -115,10 +119,10 @@ namespace EETuring
                     //If in depth check all the nodes before the last successful node
                     for (int tb = b + 1; tb < guide.Length; tb++)
                     {
-                        if (WorkbackSearch(guide, a, tb, true, usePhysicsPF))
+                        if (WorkbackSearch(path, guide, a, tb, true, usePhysicsPF))
                         {
                             currentPathNodesComplete++;
-                            return WorkbackSearch(guide, a - 1, a, backtracking, usePhysicsPF);
+                            return WorkbackSearch(path, guide, a - 1, a, backtracking, usePhysicsPF);
                         }
                     }
                 }
@@ -129,7 +133,7 @@ namespace EETuring
                 }
 
                 currentPathNodesComplete++;
-                return WorkbackSearch(guide, a - 1, b, backtracking, usePhysicsPF);
+                return WorkbackSearch(path, guide, a - 1, b, backtracking, usePhysicsPF);
             }
         }
 
