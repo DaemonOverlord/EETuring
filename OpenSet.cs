@@ -6,16 +6,17 @@ using System.Threading.Tasks;
 
 namespace EETuring
 {
-    public class OpenSet
+    public class OpenSet<T>
     {
-        private List<PlayerNode> list;
+        private List<T> list;
+        private Func<T, double> selector;
 
         public int Count { get { return list.Count; } }
 
         /// <summary>
         /// Add a node to the set
         /// </summary>
-        public void Add(PlayerNode node)
+        public void Add(T node)
         {
             list.Add(node);
         }
@@ -23,11 +24,11 @@ namespace EETuring
         /// <summary>
         /// Sorts the nodes then removes and returns the best node
         /// </summary>
-        public PlayerNode Dequeue()
+        public T Dequeue()
         {
             QuickSort(list, 0, list.Count);
 
-            PlayerNode top = list[0];
+            T top = list[0];
             list.RemoveAt(0);
             return top;
         }
@@ -35,19 +36,19 @@ namespace EETuring
         /// <summary>
         /// Quicksort partition of a list pivoting at the left and right indicies
         /// </summary>
-        private int QuicksortPartition(List<PlayerNode> list, int left, int right)
+        private int QuicksortPartition(List<T> list, int left, int right)
         {
             int start = left;
-            PlayerNode pivot = list[start];
+            T pivot = list[start];
             left++;
             right--;
 
             while (true)
             {
-                while (left <= right && list[left].F <= pivot.F)
+                while (left <= right && selector(list[left]) <= selector(pivot))
                     left++;
 
-                while (left <= right && list[right].F > pivot.F)
+                while (left <= right && selector(list[right]) > selector(pivot))
                     right--;
 
                 if (left > right)
@@ -59,7 +60,7 @@ namespace EETuring
                 }
 
 
-                PlayerNode temp = list[left];
+                T temp = list[left];
                 list[left] = list[right];
                 list[right] = temp;
 
@@ -69,7 +70,7 @@ namespace EETuring
         /// <summary>
         /// Recursive quicksort algorithm
         /// </summary>
-        private void QuickSort(List<PlayerNode> list, int left, int right)
+        private void QuickSort(List<T> list, int left, int right)
         {
             if (list == null || list.Count <= 1)
                 return;
@@ -82,9 +83,10 @@ namespace EETuring
             }
         }
 
-        public OpenSet()
+        public OpenSet(Func<T, double> selector)
         {
-            list = new List<PlayerNode>();
+            list = new List<T>();
+            this.selector = selector;
         }
     }
 }

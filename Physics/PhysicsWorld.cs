@@ -101,6 +101,10 @@ namespace EETuring.Physics
 
             return nodes;
         }
+        public List<PlayerNode> GetNodes(PhysicsPlayer p, Point pt, int steps)
+        {
+            return GetNodes(p, new PlayerState(pt), steps);
+        }
 
         public int GetBlock(int xx, int yy)
         {

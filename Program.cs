@@ -2,10 +2,7 @@
 using PlayerIOClient;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EETuring
 {
@@ -121,6 +118,23 @@ namespace EETuring
             return new WorldData(foreGroundTiles, tileData, (int)width, (int)height);
         }
 
+        public static void DrawPath(string world, EETuring.Physics.Point[] path)
+        {
+            WebRequest req = WebRequest.Create("http://api.everybodyedits.info/MapImageGenerator?id=" + world);
+            using (WebResponse res = req.GetResponse())
+            {
+                System.Drawing.Bitmap bmp = (System.Drawing.Bitmap)System.Drawing.Image.FromStream(res.GetResponseStream());
+                System.Drawing.Graphics gfx = System.Drawing.Graphics.FromImage(bmp);
+                for (int i = 0; i < path.Length - 1; i++)
+                {
+                    gfx.DrawLine(System.Drawing.Pens.Red, new System.Drawing.PointF(path[i].x * 16 + 8, path[i].y * 16 + 8), new System.Drawing.PointF(path[i + 1].x * 16 + 8, path[i + 1].y * 16 + 8));
+                }
+                gfx.Dispose();
+                bmp.Save(@"C:\Users\Austin Green\Desktop\path.png");
+                bmp.Dispose();
+            }
+        }
+
         public static void Main(string[] args)
         {
             /*
@@ -158,8 +172,10 @@ namespace EETuring
             turingTester.OnProgress += turingTester_OnProgress;
             turingTester.OnComplete += turingTester_OnComplete;
 
-            turingTester.SearchAsync(new Point(1, 23), new Point(23, 23));
+            turingTester.SearchAsync(new Point(2, 23), new Point(23, 23));
             Console.ReadKey();
+
+            turingTester.Dispose();
         }
 
         private static void turingTester_OnComplete(bool isPossible)

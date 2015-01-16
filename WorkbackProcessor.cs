@@ -40,15 +40,19 @@ namespace EETuring
                 bool usePhysicsPF = s == 0 ? false : true;
                 PathFinder pathFinder = new PathFinder(worldData, usePhysicsPF);
                 Point[] shortestPath = pathFinder.Solve(a, b);
+
                 if (shortestPath == null)
                 {
-                    if (pCallback != null) pCallback(100);
-                    if (tCallback != null) tCallback(false);
-                    return;
+                    s++;
+                    if (s >= 2)
+                    {
+                        break;
+                    }
                 }
 
                 currentSearch = s;
                 currentPathNodesComplete = 0;
+
                 long estimatatedTime = 250 * shortestPath.Length;
                 if (SearchPlane(a, b, estimatatedTime, usePhysicsPF))
                 {
@@ -156,7 +160,7 @@ namespace EETuring
             start.F = heuristic.EstimateCost(start);
 
             hashTable.Release();
-            OpenSet openSet = new OpenSet();
+            OpenSet<PlayerNode> openSet = new OpenSet<PlayerNode>(n => n.F);
             openSet.Add(start);
 
             bool found = false;
@@ -169,7 +173,7 @@ namespace EETuring
                     break;
                 }
 
-                int inc = 5;
+                int inc = 0;
                 for (int t = 0; t <= 100; t += inc)
                 {
                     List<PlayerNode> branches = world.GetNodes(player, current.State, t);
