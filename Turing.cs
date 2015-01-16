@@ -31,12 +31,25 @@ namespace EETuring
             }
         }
 
+        public void Test(Point a, Point b)
+        {
+            if (thread != null)
+            {
+                if (thread.ThreadState == ThreadState.Running)
+                {
+                    throw new InvalidOperationException("Already searching. Wait for the Search to finish.");
+                }
+            }
+
+            processor.Search(a, b);
+        }
+
         /// <summary>
         /// Start the turing test
         /// </summary>
         /// <param name="a">Start point indexed at 0</param>
         /// <param name="b">Goal point indexed at 0</param>
-        public void SearchAsync(Point a, Point b)
+        public void TestAsync(Point a, Point b)
         {
             if (thread != null)
             {

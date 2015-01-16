@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{58227868-A708-4958-A8AB-8F1BD24A3435}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EETuring</RootNamespace>
     <AssemblyName>EETuring</AssemblyName>
@@ -68,7 +68,6 @@
     <Compile Include="Physics\PlayerState.cs" />
     <Compile Include="Physics\Point.cs" />
     <Compile Include="Physics\WorldData.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
