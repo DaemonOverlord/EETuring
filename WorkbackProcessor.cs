@@ -37,17 +37,13 @@ namespace EETuring
             for (int s = 0; s < 2; s++)
             {
                 //For now this algorithm will only work with the shortest path
-                bool usePhysicsPF = s == 0 ? false : true;
+                bool usePhysicsPF = s == 0 ? true : false;
                 PathFinder pathFinder = new PathFinder(worldData, usePhysicsPF);
                 Point[] shortestPath = pathFinder.Solve(a, b);
 
                 if (shortestPath == null)
                 {
-                    s++;
-                    if (s >= 2)
-                    {
-                        break;
-                    }
+                    continue;
                 }
 
                 currentSearch = s;

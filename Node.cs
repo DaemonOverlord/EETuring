@@ -25,10 +25,11 @@ namespace EETuring
             return base.GetHashCode();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="p"></param>
+        public override string ToString()
+        {
+            return Point.ToString();
+        }
+
         public Node(Point p)
         {
             Point = p;

@@ -462,14 +462,14 @@ namespace EETuring.Physics
 
                 if (!state.IsDead)
                 {
-                    if ((input & Input.HoldSpace) != 0/* && !state.onDot*/)
+                    if ((input & Input.HoldSpace) != 0)
                     {
-                        if (state.SpeedX == 0 && !DoubleIsEqual(state.morx, 0) && !DoubleIsEqual(state.mox, 0) && state.X % 16 == 0)
+                        if (state.SpeedX == 0 && !DoubleIsEqual(state.morx, 0) && state.X % 16 == 0)
                         {
                             state.SpeedX = (state.SpeedX - (state.morx * PhysicsConfig.JumpHeight));
                         }
 
-                        if (state.SpeedY == 0 && !DoubleIsEqual(state.mory, 0) && !DoubleIsEqual(state.moy, 0) && state.Y % 16 == 0)
+                        if (state.SpeedY == 0 && !DoubleIsEqual(state.mory, 0) && state.Y % 16 == 0)
                         {
                             state.SpeedY = (state.SpeedY - (state.mory * PhysicsConfig.JumpHeight));
                         }

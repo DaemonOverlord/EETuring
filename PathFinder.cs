@@ -28,7 +28,6 @@ namespace EETuring
             return possible.ToArray();
         }
 
-
         private bool CheckPhysicsAir(Point loc, PlayerState state, int cx, int cy)
         {
             if (state.SpeedY <= -w.WorldGravity || cy > 0)
@@ -318,7 +317,6 @@ namespace EETuring
                     {
                         continue;
                     }
-
                 }
 
                 if (!ItemId.IsSolid(parentBlock) && !used.Contains(locations[i]))
@@ -326,7 +324,6 @@ namespace EETuring
                     yield return locations[i];
                 }
             }
-            yield break;
         }
 
         /// <summary>
@@ -337,20 +334,24 @@ namespace EETuring
         /// <param name="offset">Offset for pre elimination</param>
         private Point[] Heuristic(Point current, Diagram diagram, int offset)
         {
-            int best = 0;
-            List<Point> bestParents = new List<Point>();
-            Point[] parentLocations = GetAdjacent(current, world.Length, world[0].Length  );
-            for (int i = 0; i < parentLocations.Length; i++)
-            {
-                int heu = diagram[parentLocations[i]];
-                if (heu > best)
-                {
-                    best = heu;
-                    bestParents.Add(parentLocations[i]);
-                }
-            }
+            Point[] adj = GetAdjacent(current, world.Length, world[0].Length);           
+            Point temp = null;
+            int inner = 0;
 
-            return bestParents.ToArray();
+            for (int outer = 1; outer < adj.Length; outer++)
+            {
+                temp = adj[outer];
+                inner = outer;
+                while (inner > 0 && diagram[adj[inner - 1]] >= diagram[temp])
+                {
+                    adj[inner] = adj[inner - 1];
+                    inner--;
+                }
+
+                adj[inner] = temp;
+            } 
+
+            return adj;
         }
 
         /// <summary>
@@ -418,18 +419,14 @@ namespace EETuring
             Queue<Node> checkpoints = new Queue<Node>();
             List<Node> pastcheckpoints = new List<Node>();
             nodes.Add(new Node(start));
+            path.Add(start);
 
             bool found = false;
             int  i = 0;
             while (nodes.Count > 0)
             {
                 Node current = nodes.Dequeue();
-
                 Point cur = current.Point;
-                if (cur.x == 1)
-                {
-                }
-
                 current.Cost = Math.Sqrt(Math.Pow(cur.x - end.x, 2) + Math.Pow(cur.y - end.y, 2));
                 current.PNodes = w.GetNodes(p, current.Point, 1);
 
@@ -439,41 +436,47 @@ namespace EETuring
                     diagram.Set(current.Point, i++);
                     break;
                 }
+            
+                diagram.Set(current.Point, i++);
+                path.Add(cur);
 
-                if (GetAvailible(current, path) > 0 && !pastcheckpoints.Contains(current))
+                if (!usePhysics)
                 {
-                    checkpoints.Enqueue(current);
-                    pastcheckpoints.Add(current);
+                    if (GetAvailible(current, path) > 0 && !pastcheckpoints.Contains(current))
+                    {
+                        checkpoints.Enqueue(current);
+                        pastcheckpoints.Add(current);
+                    }
+
+                    Node next = ClosestPossible(current, path);
+                    if (next == null)
+                    {
+                        if (checkpoints.Count > 0)
+                        {
+                            Node check = checkpoints.Dequeue();
+                            nodes.Add(check);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else if (!path.Contains(next.Point))
+                    {
+                        nodes.Add(next);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-
-                path.Add(current.Point);
-                diagram.Set(current.Point, i++);              
-
-                //Node next = ClosestPossible(current, path);
-                //if (next == null)
-                //{
-                //    if (checkpoints.Count > 0)
-                //    {
-                //        Node check = checkpoints.Dequeue();
-                //        nodes.Add(check);
-                //    }
-                //    else
-                //    {
-                //        break;
-                //    }
-                //}
-                //else if (!path.Contains(next.Point))
-                //{
-                //    nodes.Add(next);
-                //}
-                //else
-                //{
-                //    break;
-                //}
-                IEnumerator<Point> safe = SafeParents(current, path);
-                while (safe.MoveNext())
+                else
                 {
-                    nodes.Add(new Node(safe.Current));
+                    IEnumerator<Point> safe = SafeParents(current, path);
+                    while (safe.MoveNext())
+                    {                     
+                        nodes.Add(new Node(safe.Current));
+                    }
                 }
             }
 
