@@ -130,7 +130,7 @@ namespace EETuring
                     gfx.DrawLine(System.Drawing.Pens.Red, new System.Drawing.PointF(path[i].x * 16 + 8, path[i].y * 16 + 8), new System.Drawing.PointF(path[i + 1].x * 16 + 8, path[i + 1].y * 16 + 8));
                 }
                 gfx.Dispose();
-                bmp.Save(@"C:\Users\Austin Green\Desktop\path.png");
+                bmp.Save(@"C:\path.png");
                 bmp.Dispose();
             }
         }
