@@ -30,231 +30,19 @@ namespace EETuring
 
         private bool CheckPhysicsAir(Point loc, PlayerState state, int cx, int cy)
         {
-            if (state.SpeedY <= -w.WorldGravity || cy > 0)
-            {
-                return true;
-            }
-
-            //check if there is a solid block below the location within a distance of ~10
-            bool valid = false;
-            int sx = loc.x;
-            int sy = loc.y;
-            for (int x = 0; x < data.Width; x++)
-            {
-                for (int y = sy + 1; y < sy + 4; y++)
-                {
-                    if (y < data.Height - 1)
-                    {
-                        bool canJumpOn = ItemId.CanJumpOn(world[x][y]);
-                        if (!canJumpOn && world[x][y] == 4)
-                        {
-                            if (x > 0)
-                            {
-                                if (ItemId.CanJumpOn(world[x - 1][y]))
-                                {
-                                    canJumpOn = true;
-                                }
-                            }
-
-                            if (x < data.Width - 1)
-                            {
-                                if (ItemId.CanJumpOn(world[x + 1][y]))
-                                {
-                                    canJumpOn = true;
-                                }
-                            }
-                        }
-
-                        if (canJumpOn && ItemId.IsSolid(world[x][y + 1]))
-                        {
-                            double dis = Math.Sqrt(Math.Pow(sx - x, 2) + Math.Pow(sy - y, 2));
-                            if (dis <= 5)
-                            {
-                                valid = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (valid)
-                {
-                    break;
-                }
-            }
-
-            return valid;
+            return state.SpeedY <= -w.WorldGravity || cy > 0;
         }
         private bool CheckPhysicsArrowLeft(Point loc, PlayerState state, int cx, int cy)
         {
-            if (state.SpeedX >= w.WorldGravity || cx < 0)
-            {
-                return true;
-            }
-
-            //check if there is a solid block below the location within a distance of ~10
-            bool valid = false;
-            int sx = loc.x;
-            int sy = loc.y;
-            for (int y = 0; y < data.Height; y++)
-            {
-                for (int x = sx + 1; x < sx + 4; x++)
-                {
-                    if (x < data.Width - 1)
-                    {
-                        bool canJumpOn = ItemId.CanJumpOn(world[x][y]);
-                        if (!canJumpOn && world[x][y] == 4)
-                        {
-                            if (y > 0)
-                            {
-                                if (ItemId.CanJumpOn(world[x][y - 1]))
-                                {
-                                    canJumpOn = true;
-                                }
-                            }
-
-                            if (y < data.Height - 1)
-                            {
-                                if (ItemId.CanJumpOn(world[x][y + 1]))
-                                {
-                                    canJumpOn = true;
-                                }
-                            }
-                        }
-
-                        if (canJumpOn && ItemId.IsSolid(world[x - 1][y]))
-                        {
-                            double dis = Math.Sqrt(Math.Pow(sx - x, 2) + Math.Pow(sy - y, 2));
-                            if (dis <= 5)
-                            {
-                                valid = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (valid)
-                {
-                    break;
-                }
-            }
-
-            return valid;
+            return state.SpeedX >= w.WorldGravity || cx < 0;
         }
         private bool CheckPhysicsArrowRight(Point loc, PlayerState state, int cx, int cy)
         {
-            if (state.SpeedX <= -w.WorldGravity || cx > 0)
-            {
-                return true;
-            }
-
-            //check if there is a solid block below the location within a distance of ~10
-            bool valid = false;
-            int sx = loc.x;
-            int sy = loc.y;
-            for (int y = 0; y < data.Height; y++)
-            {
-                for (int x = sx + 1; x < sx + 4; x++)
-                {
-                    if (x < data.Width - 1)
-                    {
-                        bool canJumpOn = ItemId.CanJumpOn(world[x][y]);
-                        if (!canJumpOn && world[x][y] == 4)
-                        {
-                            if (y > 0)
-                            {
-                                if (ItemId.CanJumpOn(world[x][y - 1]))
-                                {
-                                    canJumpOn = true;
-                                }
-                            }
-
-                            if (y < data.Height - 1)
-                            {
-                                if (ItemId.CanJumpOn(world[x][y + 1]))
-                                {
-                                    canJumpOn = true;
-                                }
-                            }
-                        }
-
-                        if (canJumpOn && ItemId.IsSolid(world[x + 1][y]))
-                        {
-                            double dis = Math.Sqrt(Math.Pow(sx - x, 2) + Math.Pow(sy - y, 2));
-                            if (dis <= 5)
-                            {
-                                valid = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (valid)
-                {
-                    break;
-                }
-            }
-
-            return valid;
+            return state.SpeedX <= -w.WorldGravity || cx > 0;
         }
         private bool CheckPhysicsArrowUp(Point loc, PlayerState state, int cx, int cy)
         {
-            if (state.SpeedY >= w.WorldGravity || cy < 0)
-            {
-                return true;
-            }
-
-            //check if there is a solid block below the location within a distance of ~10
-            bool valid = false;
-            int sx = loc.x;
-            int sy = loc.y;
-            for (int x = 0; x < data.Width; x++)
-            {
-                for (int y = sy + 1; y < sy + 4; y++)
-                {
-                    if (y < data.Height - 1)
-                    {
-                        bool canJumpOn = ItemId.CanJumpOn(world[x][y]);
-                        if (!canJumpOn && world[x][y] == 4)
-                        {
-                            if (x > 0)
-                            {
-                                if (ItemId.CanJumpOn(world[x - 1][y]))
-                                {
-                                    canJumpOn = true;
-                                }
-                            }
-
-                            if (x < data.Width - 1)
-                            {
-                                if (ItemId.CanJumpOn(world[x + 1][y]))
-                                {
-                                    canJumpOn = true;
-                                }
-                            }
-                        }
-
-                        if (canJumpOn && ItemId.IsSolid(world[x][y - 1]))
-                        {
-                            double dis = Math.Sqrt(Math.Pow(sx - x, 2) + Math.Pow(sy - y, 2));
-                            if (dis <= 5)
-                            {
-                                valid = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (valid)
-                {
-                    break;
-                }
-            }
-
-            return valid;
+            return state.SpeedY >= w.WorldGravity || cy < 0;
         }
 
         /// <summary>
@@ -427,6 +215,7 @@ namespace EETuring
             {
                 Node current = nodes.Dequeue();
                 Point cur = current.Point;
+
                 current.Cost = Math.Sqrt(Math.Pow(cur.x - end.x, 2) + Math.Pow(cur.y - end.y, 2));
                 current.PNodes = w.GetNodes(p, current.Point, 1);
 
@@ -488,11 +277,6 @@ namespace EETuring
                     return null;
                 }
 
-                if (constructedPath.Length == 1)
-                {
-                    return new Point[] { end };
-                }
-
                 return constructedPath;
             }
             
@@ -530,6 +314,7 @@ namespace EETuring
                     Point current = nodes.Dequeue();
                     if (current.Equals(end))
                     {
+                        traveled.Add(end);
                         return traveled.ToArray();
                     }
 

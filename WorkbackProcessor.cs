@@ -96,7 +96,7 @@ namespace EETuring
             Point goal = guide[b];
 
             int length = b - a;
-            long toMs = (backtracking) ? 500 : 1000;
+            long toMs = (backtracking) ? 1000 : 1000;
             if (SearchPlane(start, goal, toMs, usePhysicsPF))
             {
                 if (!backtracking)
@@ -143,6 +143,7 @@ namespace EETuring
         private bool SearchPlane(Point a, Point b, long timeout, bool usePhysicsPF)
         {
             PlayerState sState = new PlayerState(a);
+            sState = player.Tick(sState, Input.Nothing, 1);
 
             if (a.Equals(b))
             {
@@ -163,7 +164,6 @@ namespace EETuring
             OpenSet<PlayerNode> openSet = new OpenSet<PlayerNode>(n => n.F);
             openSet.Add(start);
 
-            bool found = false;
             Stopwatch sw = Stopwatch.StartNew();
             while (openSet.Count > 0)
             {
@@ -187,7 +187,7 @@ namespace EETuring
 
                         if (branches[i].IsGoal(b))
                         {
-                            found = true;
+                            return true;
                         }
 
                         hashTable.Add(branches[i].State);
@@ -196,11 +196,6 @@ namespace EETuring
                     }
 
                     inc += 5;
-                }
-
-                if (found)
-                {
-                    return true;
                 }
             }
 

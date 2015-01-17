@@ -46,6 +46,12 @@ namespace EETuring.Physics
         public double ModifierX { get { return modifierX * PhysicsConfig.VariableMultiplier; } internal set { modifierX = value / PhysicsConfig.VariableMultiplier; } }
         public double ModifierY { get { return modifierY * PhysicsConfig.VariableMultiplier; } internal set { modifierY = value / PhysicsConfig.VariableMultiplier; } }
 
+        public void SetPosition(Point p)
+        {
+            X = p.x * 16;
+            Y = p.y * 16;
+        }
+
         private byte[] GetBytes(double d)
         {
             return BitConverter.GetBytes(d);
@@ -128,8 +134,7 @@ namespace EETuring.Physics
 
         public PlayerState(Point p) : this()
         {
-            X = p.x * 16;
-            Y = p.y * 16;
+            SetPosition(p);
         }
 
         public PlayerState(PlayerState state)
