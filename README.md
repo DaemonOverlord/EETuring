@@ -4,7 +4,8 @@ Everybody Edits Turing Validator
 Validates a path from A to B
 
 Quick start guide:
-(function to get world data can be found in Program.cs)
+
+[Get World Data Method](https://gist.github.com/ThyChief/12d08be2dabd2e5a3d68)
 
 ```csharp
 Turing turingTester = new Turing(world);
