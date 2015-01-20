@@ -18,8 +18,10 @@ namespace EETuring
         /// <summary>
         /// Gets adjacent inbound nodes
         /// </summary>
-        private Point[] GetAdjacent(Point current, int gridWidth, int gridHeight)
+        private Point[] GetAdjacent(Node n, int gridWidth, int gridHeight)
         {
+            Point current = (n.PortalDestination != null) ? n.PortalDestination : n.Point;
+
             List<Point> possible = new List<Point>();
             if (current.x != 0) possible.Add(new Point(current.x - 1, current.y));
             if (current.y != 0) possible.Add(new Point(current.x, current.y - 1));
@@ -55,7 +57,7 @@ namespace EETuring
             Point current = n.Point;
 
             int currentB = world[current.x][current.y];
-            Point[] locations = GetAdjacent(current, world.Length, world[0].Length);
+            Point[] locations = GetAdjacent(n, world.Length, world[0].Length);
             for (int i = 0; i < locations.Length; i++)
             {
                 int cx = locations[i].x - current.x;
@@ -120,8 +122,9 @@ namespace EETuring
         /// <param name="current">Current node point</param>
         /// <param name="diagram">Diagram of values</param>
         /// <param name="offset">Offset for pre elimination</param>
-        private Point[] Heuristic(Point current, Diagram diagram, int offset)
+        private Point[] Heuristic(Point p, Diagram diagram, int offset)
         {
+            Node current = CheckPortalPath(p);
             Point[] adj = GetAdjacent(current, world.Length, world[0].Length);           
             Point temp = null;
             int inner = 0;
@@ -192,6 +195,28 @@ namespace EETuring
         }
 
         /// <summary>
+        /// Gets the teleportation path of a portal
+        /// </summary>
+        private Node CheckPortalPath(Point p)
+        {
+            Node n = new Node(p);
+
+            int cur = world[p.x][p.y];
+            if (cur == ItemId.Portal || cur == ItemId.PortalInvisible)
+            {
+                int portalTargetId = data.TileData[p.x][p.y][2];
+
+                Point portalLoc = w.GetPortalById(portalTargetId);
+                if (portalLoc != null)
+                {
+                    n.PortalDestination = portalLoc;
+                }
+            }
+
+            return n;
+        }
+
+        /// <summary>
         /// Fiinds a path given a start and end
         /// </summary>
         /// <param name="start">Start of path</param>
@@ -237,7 +262,10 @@ namespace EETuring
                         pastcheckpoints.Add(current);
                     }
 
-                    Node next = ClosestPossible(current, path);
+                    Node closestNode = ClosestPossible(current, path);
+
+                    Node next = (closestNode == null) ? null : CheckPortalPath(closestNode.Point);
+
                     if (next == null)
                     {
                         if (checkpoints.Count > 0)
@@ -263,8 +291,9 @@ namespace EETuring
                 {
                     IEnumerator<Point> safe = SafeParents(current, path);
                     while (safe.MoveNext())
-                    {                     
-                        nodes.Add(new Node(safe.Current));
+                    {
+                        Node portalCheck = CheckPortalPath(safe.Current);
+                        nodes.Add(portalCheck);
                     }
                 }
             }
@@ -320,6 +349,7 @@ namespace EETuring
 
                     diagram.Set(current, i++);
                     traveled.Add(current);
+
                     Point[] paths = Heuristic(current, diagram, offset);
                     for (int j = paths.Length - 1; j >= 0; j--) //Go backwards because the last node will have the highest heuristic value, refer to Heuristic()
                     {

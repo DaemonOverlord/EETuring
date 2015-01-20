@@ -312,7 +312,6 @@ namespace EETuring.Physics
                     {
                         if (state.lastPortal == null)
                         {
-                            //OnHitPortal(new PlayerEventArgs() { Player = this, BlockX = cx, BlockY = cy });
                             state.lastPortal = new Point(cx, cy);
                             int[] data = HostWorld.GetBlockData(cx, cy);
                             if (data != null && data.Length == 3)

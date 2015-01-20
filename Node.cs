@@ -5,6 +5,7 @@ namespace EETuring
 {
     public class Node
     {
+        public Point PortalDestination { get; set; }
         public double Cost { get; set; }
         public Point Point { get; set; }
         public List<PlayerNode> PNodes { get; set; }

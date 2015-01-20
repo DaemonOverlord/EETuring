@@ -55,7 +55,7 @@ namespace EETuring.Physics
             {
                 for (int ii = 0; ii < foregroundTiles[i].Length; ii++)
                 {
-                    if (foregroundTiles[i][ii] == 242 || foregroundTiles[i][ii] == 381)
+                    if (foregroundTiles[i][ii] == ItemId.Portal || foregroundTiles[i][ii] == ItemId.PortalInvisible)
                     {
                         if (tileData[i][ii][1] == id)
                         {
@@ -122,7 +122,7 @@ namespace EETuring.Physics
                 return null;
             }
             return tileData[xx][yy];
-        }      
+        }
 
         public bool Overlaps(PlayerState state)
         {
